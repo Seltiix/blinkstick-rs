@@ -2,7 +2,6 @@
 
 blinkstick-rs provides an interface to control any [BlinkStick device](https://www.blinkstick.com/) using Rust.
 
-# About
 # Examples
 
 Sets the color of the 0th led to red
