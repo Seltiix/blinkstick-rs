@@ -1,1 +1,3 @@
 # Blinkstick-rs
+# About
+# Examples
