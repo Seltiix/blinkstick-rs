@@ -11,6 +11,7 @@ Logs all version updates within the project.
 - Added a function `set_all_leds_colors` to set different colors for every led on the BlinkStick device
 - Added a function `blink_all_leds_color` to make all leds blink in a single `Color`
 - Added a function `transform_multiple_leds_color` to transform the color of the specified leds into a single `Color`
+- Added a function `pulse_all_leds_color` to make every single led pulse between their current color and a specified `Color`
 - Added a new public `BlinkStick` struct variable `max_leds` that holds the number of leds available on the attached BlinkStick device
 - A changelog document to track changes between versions
 
