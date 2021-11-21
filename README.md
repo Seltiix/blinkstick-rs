@@ -55,3 +55,6 @@ let blinkstick = BlinkStick::new();
 blinkstick.set_led_color(1, Color {r: 50, g: 0, b: 0});
 blinkstick.transform_led_color(1, std::time::Duration::from_secs(5), 50, Color {r: 0, g: 50, b: 0});
 ```
+
+# Running tests
+Tests are only runnable when a BlinkStick device is plugged in. Furthermore, tests should be run using `cargo test -- --test-threads=1` or `cargo test -- --test-threads=1` or they might fail.
