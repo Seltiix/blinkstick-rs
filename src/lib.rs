@@ -61,7 +61,7 @@ impl BlinkStick {
 
     /// Generates a random color
     ///
-    /// # Examples
+    /// # Example
     /// Returns a random `Color`
     /// ```
     /// use blinkstick_rs::{BlinkStick, Color};
@@ -81,7 +81,7 @@ impl BlinkStick {
 
     /// Returns a Vector with an appropriate vector length for the plugged in BlinkStick device
     ///
-    /// # Examples
+    /// # Example
     /// Returns a `Color` vector
     /// ```
     /// use blinkstick_rs::{BlinkStick, Color};
@@ -102,7 +102,7 @@ impl BlinkStick {
     /// # Panics
     /// The call to `set_color` will panic if the specifed `led` is out of bounds for the connected BlinkStick device.
     ///
-    /// # Examples
+    /// # Example
     /// Sets the color of the 0th led to red
     /// ```no_run
     /// use blinkstick_rs::{BlinkStick, Color};
@@ -129,7 +129,7 @@ impl BlinkStick {
     /// # Panics
     /// The call to set_unified_color will panic if any of the specified `leds` is out of bounds for the BlinkStick device.
     ///
-    /// # Examples
+    /// # Example
     /// Sets the color of 0th, 2nd, 4th and 6th led to green.
     /// ```no_run
     /// use blinkstick_rs::{BlinkStick, Color};
@@ -168,7 +168,7 @@ impl BlinkStick {
     /// # Arguments
     /// * `color` - A struct holding color values for R,G and B channel respectively
     ///
-    /// # Examples
+    /// # Example
     /// Turns every led blue
     /// ```no_run
     /// use blinkstick_rs::{BlinkStick, Color};
@@ -188,7 +188,7 @@ impl BlinkStick {
     /// # Panics
     /// The call to `blink_color` will panic if the length of the color vector is greater then the number of available leds
     ///
-    /// # Examples
+    /// # Example
     /// Sets a different color for each led on the device
     /// ```
     /// use blinkstick_rs::{BlinkStick, Color};
@@ -240,7 +240,7 @@ impl BlinkStick {
     /// # Panics
     /// The call to `blink_color` will panic if the specifed `led` is out of bounds for the connected BlinkStick device.
     ///
-    /// # Examples
+    /// # Example
     /// Makes the 0th led blink 5 times, once every second, with a purple glow
     /// ```no_run
     /// use blinkstick_rs::{BlinkStick, Color};
@@ -268,7 +268,7 @@ impl BlinkStick {
     /// # Panics
     /// The call to `blink_unified_color` will panic if any of the specified `leds` is out of bounds for the BlinkStick device.
     ///
-    /// # Examples
+    /// # Example
     /// Makes the 1st, 3rd, 5th led blink 2 times, once every 200 miliseconds, with a yellow glow
     /// ```no_run
     /// use blinkstick_rs::{BlinkStick, Color};
@@ -292,7 +292,7 @@ impl BlinkStick {
     /// * `blinks` - The number of times the lights will blink
     /// * `color` - A struct holding color values for R,G and B channel respectively
     ///
-    /// # Examples
+    /// # Example
     /// Makes all leds blink 2 times, once every 200 miliseconds, with a yellow glow
     /// ```no_run
     /// use blinkstick_rs::{BlinkStick, Color};
@@ -307,7 +307,6 @@ impl BlinkStick {
     // @TODO
     //pub fn pulse_unified_color()
     //pub fn pulse_all_colors()
-    //pub fn transform_unified_color()
     //pub fn transform_all_colors()
 
     /// Makes the specified led pulse from its current color to a specified color and back again
@@ -325,7 +324,7 @@ impl BlinkStick {
     /// meaning that the animation would have taken longer then the specified duration to finish. Therefore, the function
     /// panics if this threshold is overstepped. A rule of thumb is for each second of animation, 50 steps is a softmax.
     ///
-    /// # Examples
+    /// # Example
     /// Makes the 2nd led, pulse from an off state, to a blue glow, and then return back again to the off state with a two second animation time
     /// ```no_run
     /// use blinkstick_rs::{BlinkStick, Color};
@@ -339,10 +338,44 @@ impl BlinkStick {
         self.transform_color(led, duration / 2, steps, old_color);
     }
 
-    /// WIP
-    // pub fn pulse_unified_color(&self, leds: &Vec<u8>, duration: Duration, steps: u64, color: Color) {
+    /// Makes the specified leds pulse to a single color and back to their original color
+    /// 
+    /// # Arguments
+    /// * `leds` - A vector of zero-indexed led numbers (within bounds for the BlinkStick product)
+    /// * `duration` - The time it takes for the entire animation cycle to finish
+    /// * `steps` - The number of times the color value is update during the transformation
+    /// * `color` - A struct holding color values for R,G and B channel respectively
+    /// 
+    /// # Panics
+    /// The call to `blink_unified_color` will panic if any of the specified `leds` is out of bounds for the BlinkStick device.
+    ///
+    /// Additionally, by choosing a very high `step` count, it makes the internal animation interval shorter then the function execution
+    /// meaning that the animation would have taken longer then the specified duration to finish. Therefore, the function
+    /// panics if this threshold is overstepped. A rule of thumb is for each second of animation, 100 steps is a softmax.
+    /// 
+    /// # Example
+    /// Gives every led a random color, and make it pulse to a blue color
+    /// ```
+    /// use blinkstick_rs::{BlinkStick, Color};
+    ///
+    /// let blinkstick = BlinkStick::new();
+    /// 
+    /// let mut colors: Vec<Color> = blinkstick.get_color_vec();
+    /// for led in 0..blinkstick.max_leds as usize {
+    ///     colors[led] = BlinkStick::get_random_color();
+    /// }
+    /// blinkstick.set_all_colors(&colors);
+    /// 
+    /// let led_vec = (0..blinkstick.max_leds).collect();
+    /// let color = Color {r: 0, g: 0, b: 55};
+    /// blinkstick.pulse_unified_color(&led_vec, std::time::Duration::from_secs(5), 50, color);
+    /// ```
+    pub fn pulse_unified_color(&self, leds: &Vec<u8>, duration: Duration, steps: u64, color: Color) {
+        let old_colors = self.get_colors();
 
-    // }
+        self.transform_unified_color(leds, duration / 2, steps, color);
+        self.transform_all_colors(duration / 2, steps, &old_colors)
+    }
 
     /// Makes the specified led shift into a different color
     /// # Arguments
@@ -358,7 +391,7 @@ impl BlinkStick {
     /// meaning that the animation would have taken longer then the specified duration to finish. Therefore, the function
     /// panics if this threshold is overstepped. A rule of thumb is for each second of animation, 100 steps is a softmax.
     ///
-    /// # Examples
+    /// # Example
     /// Makes the 1st led transform from a red color into a green color over a period of five seconds, with 50 color updates.
     /// ```no_run
     /// use blinkstick_rs::{BlinkStick, Color};
@@ -380,6 +413,66 @@ impl BlinkStick {
             };
 
             self.set_color(led, new_color);
+            let elapsed = start.elapsed().as_millis() as u64;
+
+            if elapsed > interval {
+                panic!("Executing a single color move took {} miliseconds, whilst the interval is set to {} miliseconds. Please reduce the number steps or increase the animation time.", elapsed, interval)
+            }
+
+            std::thread::sleep(Duration::from_millis(interval - elapsed));
+        }
+    }
+
+    /// Transforms the color of all leds into a specified color
+    /// 
+    /// # Arguments
+    /// * `duration` - The time it takes for the entire animation cycle to finish
+    /// * `steps` - The number of times the color value is update during the transformation
+    /// * `colors` - A vector of `Color` with equal length to the number of leds available on the device.
+    /// 
+    /// # Panics
+    /// The call to `blink_unified_color` will panic if any of the specified `leds` is out of bounds for the BlinkStick device.
+    ///
+    /// Additionally, by choosing a very high `step` count, it makes the internal animation interval shorter then the function execution
+    /// meaning that the animation would have taken longer then the specified duration to finish. Therefore, the function
+    /// panics if this threshold is overstepped. A rule of thumb is for each second of animation, 100 steps is a softmax.
+    ///     
+    //// # Example
+    /// Sets a random color for each available led then transforms each individual led into a different random `Color`.
+    /// ```
+    /// use blinkstick_rs::{BlinkStick, Color};
+    /// let blinkstick = BlinkStick::new();
+    ///
+    /// let mut colors: Vec<Color> = blinkstick.get_color_vec();
+    /// for led in 0..blinkstick.max_leds as usize {
+    ///     colors[led] = BlinkStick::get_random_color();
+    /// }
+    /// 
+    /// let mut new_colors: Vec<Color> = blinkstick.get_color_vec();
+    /// for led in 0..blinkstick.max_leds as usize {
+    ///     new_colors[led] = BlinkStick::get_random_color();
+    /// }
+    ///
+    /// blinkstick.set_all_colors(&colors);
+    /// blinkstick.transform_all_colors(std::time::Duration::from_secs(2), 200, &new_colors);
+    /// ```
+    pub fn transform_all_colors(&self, duration: Duration, steps: u64, colors: &Vec<Color>) {
+        let interval = duration.as_millis() as u64 / steps;
+
+        for step in 0..steps {
+            let start = Instant::now();
+
+            let mut led_colors = self.get_colors();
+            for led in 0..self.max_leds as usize {
+                let led_color = &mut led_colors[led as usize];
+
+                led_color.r = self.move_color(led_color.r, colors[led].r, step, steps);
+                led_color.g = self.move_color(led_color.g, colors[led].g, step, steps);
+                led_color.b = self.move_color(led_color.b, colors[led].b, step, steps);
+            }
+
+            self.set_all_colors(&led_colors);
+
             let elapsed = start.elapsed().as_millis() as u64;
 
             if elapsed > interval {
@@ -578,6 +671,21 @@ mod blinkstick {
 
     #[test]
     #[serial]
+    fn blink_color() {
+        let blinkstick = BlinkStick::new();
+
+        let blink_color = Color {
+            r: 25,
+            g: 65,
+            b: 100,
+        };
+        blinkstick.blink_color(3, std::time::Duration::from_millis(200), 5, blink_color);
+
+        assert_eq!(blinkstick.get_color(3), Color {r: 0, g: 0, b: 0});
+    }
+
+    #[test]
+    #[serial]
     fn blink_all_color() {
         let blinkstick = BlinkStick::new();
 
@@ -586,7 +694,9 @@ mod blinkstick {
             g: 65,
             b: 100,
         };
-        blinkstick.blink_all_color(std::time::Duration::from_millis(200), 5, blink_color)
+        blinkstick.blink_all_color(std::time::Duration::from_millis(200), 5, blink_color);
+
+        assert_eq!(blinkstick.get_colors(), vec![Color {r: 0, g: 0, b: 0}; blinkstick.max_leds as usize]);
     }
 
     #[test]
@@ -632,7 +742,7 @@ mod blinkstick {
         blinkstick.set_color(2, from_color);
         assert_eq!(blinkstick.get_color(2), from_color);
 
-        blinkstick.transform_color(2, Duration::from_secs(1), 100, to_color);
+        blinkstick.transform_color(2, Duration::from_secs(1), 25, to_color);
         assert_eq!(blinkstick.get_color(2), to_color);
     }
 
@@ -658,8 +768,8 @@ mod blinkstick {
 
         blinkstick.transform_unified_color(
             &vec![3, 5],
-            std::time::Duration::from_secs(6),
-            60,
+            std::time::Duration::from_secs(4),
+            25,
             target_color,
         );
 
@@ -677,7 +787,7 @@ mod blinkstick {
 
         blinkstick.set_color(2, from_color);
         assert_eq!(blinkstick.get_color(2), from_color);
-        blinkstick.pulse_color(2, Duration::from_secs(2), 100, to_color);
+        blinkstick.pulse_color(2, Duration::from_secs(2), 25, to_color);
         assert_eq!(blinkstick.get_color(2), from_color);
     }
 }
