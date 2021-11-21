@@ -8,14 +8,16 @@ Logs all version updates within the project.
 
 - Added a function `get_random_color` to generate a random `Color`
 - Added a function `get_color_vec` to return a proerly sized `Vec<Color>` depending on the BlinkStick device
-- Added a function `set_all_colors` to set different colors for every led on the BlinkStick device
-- Added a function `blink_all_color` to make all leds blink in a single `Color`
-- Added a function `transform_unified_color` to transform the color of the specified leds into a single `Color`
+- Added a function `set_all_leds_colors` to set different colors for every led on the BlinkStick device
+- Added a function `blink_all_leds_color` to make all leds blink in a single `Color`
+- Added a function `transform_multiple_leds_color` to transform the color of the specified leds into a single `Color`
 - Added a new public `BlinkStick` struct variable `max_leds` that holds the number of leds available on the attached BlinkStick device
 - A changelog document to track changes between versions
 
 ### Changed
 
+- Made `get_all_led_colors` function public
+- Made `get_led_color` function public
 - Global usage of the now public `Color` struct
 - Renamed functions to make space for future multi-color functions
 - Various performance fixes
