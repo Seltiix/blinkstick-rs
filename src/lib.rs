@@ -11,6 +11,8 @@ extern crate hidapi;
 const VENDOR_ID: u16 = 0x20a0;
 const PRODUCT_ID: u16 = 0x41e5;
 
+const REPORT_ARRAY_BYTES: usize = 100;
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Color {
     pub r: u8,
@@ -21,6 +23,7 @@ pub struct Color {
 pub struct BlinkStick {
     device: hidapi::HidDevice,
     pub max_leds: u8,
+    report_length: usize
 }
 
 impl Drop for BlinkStick {
@@ -28,12 +31,14 @@ impl Drop for BlinkStick {
         self.set_all_color(Color { r: 0, g: 0, b: 0 });
     }
 }
+
 impl BlinkStick {
     /// Opens communication with a `BlinkStick Device`
     /// # Panics
     /// When there is no connected BlinkStick device, the call to new will panic.
     pub fn new() -> BlinkStick {
         let api = hidapi::HidApi::new().expect("Could not create a hid api");
+
         let device = api.open(VENDOR_ID, PRODUCT_ID);
 
         let device = match device {
@@ -43,14 +48,15 @@ impl BlinkStick {
 
         // Determines the number of leds for a device. The BlinkStick Flex has 32 leds with 3 channels, which is the maximum of any device.
         // 32 * 3 + 2 = 98 bytes
-        let mut buf: [u8; 100] = [0; 100];
+        let mut buf: [u8; REPORT_ARRAY_BYTES] = [0; REPORT_ARRAY_BYTES];
         buf[0] = 0x6;
         let bytes_read = device.get_feature_report(&mut buf).unwrap();
 
         // First two bytes are meta information
         let max_leds = ((bytes_read - 2) / 3) as u8;
+        let report_length = ((max_leds * 3) + 2).into();
 
-        BlinkStick { device, max_leds }
+        BlinkStick { device, max_leds,  report_length }
     }
 
     /// Generates a random color
@@ -132,7 +138,7 @@ impl BlinkStick {
     /// blinkstick.set_unified_color(&vec![0, 2, 4, 6], Color {r: 0, g: 50, b: 0});
     /// ```
     pub fn set_unified_color(&self, leds: &Vec<u8>, color: Color) {
-        let mut data_vec: [u8; 100] = [0; 100];
+        let mut data_vec: [u8; REPORT_ARRAY_BYTES] = [0; REPORT_ARRAY_BYTES];
         data_vec[0] = 0x6;
 
         for led in leds {
@@ -153,7 +159,7 @@ impl BlinkStick {
         }
 
         self.device
-            .send_feature_report(&data_vec)
+            .send_feature_report(&data_vec[0..self.report_length])
             .expect("Could not set the color of Blinkstick leds");
     }
 
@@ -198,7 +204,7 @@ impl BlinkStick {
     /// blinkstick.set_all_colors(&colors);
     /// ```
     pub fn set_all_colors(&self, colors: &Vec<Color>) {
-        let mut data_vec: [u8; 100] = [0; 100];
+        let mut data_vec: [u8; REPORT_ARRAY_BYTES] = [0; REPORT_ARRAY_BYTES];
         data_vec[0] = 0x6;
 
         for led in 0..self.max_leds as usize {
@@ -219,7 +225,7 @@ impl BlinkStick {
         }
 
         self.device
-            .send_feature_report(&data_vec)
+            .send_feature_report(&data_vec[0..self.report_length])
             .expect("Could not set the color of Blinkstick leds");
     }
 
@@ -471,7 +477,7 @@ impl BlinkStick {
 
     // Gets the
     fn get_colors(&self) -> Vec<Color> {
-        let mut buf: [u8; 100] = [0; 100];
+        let mut buf: [u8; REPORT_ARRAY_BYTES] = [0; REPORT_ARRAY_BYTES];
         buf[0] = 0x6;
         self.device.get_feature_report(&mut buf).unwrap();
 
