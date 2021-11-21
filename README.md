@@ -25,7 +25,7 @@ Turns every led blue
 use blinkstick_rs::{BlinkStick, Color};
  
 let blinkstick = BlinkStick::new();
-blinkstick.set_all_colors(Color {r: 0, g: 0, b: 50});
+blinkstick.set_all_color(Color {r: 0, g: 0, b: 50});
 ```
 
 Makes the 0th led blink 5 times, once every second, with a purple glow
