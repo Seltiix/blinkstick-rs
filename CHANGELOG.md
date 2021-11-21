@@ -2,7 +2,7 @@
 
 Logs all version updates within the project.
 
-## [Unreleased-0.2.0]
+## [0.2.0]
 
 ### Added 
 
@@ -32,4 +32,4 @@ Logs all version updates within the project.
 - Removed various overlapping tests
 
 
-[Unreleased-0.2.0]: https://github.com/Seltiix/blinkstick-rs/compare/HEAD...0.2.0
+[0.2.0]: https://github.com/Seltiix/blinkstick-rs/compare/HEAD...0.2.0
