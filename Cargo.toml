@@ -15,7 +15,4 @@ exclude = ["src/main.rs"]
 hidapi = "1.2.6"
 rand = "0.8.4"
 
-[dev-dependencies]
-serial_test = "0.5.1"
-
 

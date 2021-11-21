@@ -688,16 +688,13 @@ impl BlinkStick {
 #[cfg(test)]
 mod blinkstick {
     use super::*;
-    use serial_test::serial;
 
     #[test]
-    #[serial]
     fn create_device_connection() {
         BlinkStick::new();
     }
 
     #[test]
-    #[serial]
     fn get_led_color() {
         let blinkstick = BlinkStick::new();
 
@@ -710,7 +707,6 @@ mod blinkstick {
     }
 
     #[test]
-    #[serial]
     fn get_all_led_colors() {
         let blinkstick = BlinkStick::new();
 
@@ -723,7 +719,6 @@ mod blinkstick {
     }
 
     #[test]
-    #[serial]
     fn flash_multiple_leds_single_color() {
         let blinkstick = BlinkStick::new();
 
@@ -744,7 +739,6 @@ mod blinkstick {
     }
 
     #[test]
-    #[serial]
     #[should_panic]
     fn flash_multiple_leds_out_of_bounds() {
         let blinkstick = BlinkStick::new();
@@ -753,7 +747,6 @@ mod blinkstick {
     }
 
     #[test]
-    #[serial]
     fn blink_led_color() {
         let blinkstick = BlinkStick::new();
 
@@ -768,7 +761,6 @@ mod blinkstick {
     }
 
     #[test]
-    #[serial]
     fn blink_all_leds_color() {
         let blinkstick = BlinkStick::new();
 
@@ -786,7 +778,6 @@ mod blinkstick {
     }
 
     #[test]
-    #[serial]
     #[should_panic]
     fn blink_single_led_out_of_bounds() {
         let blinkstick = BlinkStick::new();
@@ -800,7 +791,6 @@ mod blinkstick {
     }
 
     #[test]
-    #[serial]
     #[should_panic]
     fn blink_multiple_leds_out_of_bounds() {
         let blinkstick = BlinkStick::new();
@@ -814,7 +804,6 @@ mod blinkstick {
     }
 
     #[test]
-    #[serial]
     fn transform_led_color() {
         let blinkstick = BlinkStick::new();
 
@@ -833,7 +822,6 @@ mod blinkstick {
     }
 
     #[test]
-    #[serial]
     fn transform_multiple_leds_color() {
         let blinkstick = BlinkStick::new();
 
@@ -864,7 +852,6 @@ mod blinkstick {
     }
 
     #[test]
-    #[serial]
     fn pulse_led_color() {
         let blinkstick = BlinkStick::new();
 
