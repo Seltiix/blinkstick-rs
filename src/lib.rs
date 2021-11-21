@@ -137,7 +137,7 @@ impl BlinkStick {
     ///
     /// # Example
     /// Sets the color of 0th, 2nd, 4th and 6th led to green.
-    /// ```no_run
+    /// ```
     /// use blinkstick_rs::{BlinkStick, Color};
     ///
     /// let blinkstick = BlinkStick::new();
@@ -176,7 +176,7 @@ impl BlinkStick {
     ///
     /// # Example
     /// Turns every led blue
-    /// ```no_run
+    /// ```
     /// use blinkstick_rs::{BlinkStick, Color};
     ///
     /// let blinkstick = BlinkStick::new();
@@ -248,7 +248,7 @@ impl BlinkStick {
     ///
     /// # Example
     /// Makes the 0th led blink 5 times, once every second, with a purple glow
-    /// ```no_run
+    /// ```
     /// use blinkstick_rs::{BlinkStick, Color};
     ///
     /// let blinkstick = BlinkStick::new();
@@ -276,7 +276,7 @@ impl BlinkStick {
     ///
     /// # Example
     /// Makes the zeroth and first led blink 2 times, once every 200 miliseconds, with a yellow glow
-    /// ```no_run
+    /// ```
     /// use blinkstick_rs::{BlinkStick, Color};
     ///
     /// let blinkstick = BlinkStick::new();
@@ -306,7 +306,7 @@ impl BlinkStick {
     ///
     /// # Example
     /// Makes all leds blink 2 times, once every 200 miliseconds, with a yellow glow
-    /// ```no_run
+    /// ```
     /// use blinkstick_rs::{BlinkStick, Color};
     ///
     /// let blinkstick = BlinkStick::new();
@@ -333,7 +333,7 @@ impl BlinkStick {
     ///
     /// # Example
     /// Makes the 2nd led, pulse from an off state, to a blue glow, and then return back again to the off state with a two second animation time
-    /// ```no_run
+    /// ```
     /// use blinkstick_rs::{BlinkStick, Color};
     ///
     /// let blinkstick = BlinkStick::new();
@@ -436,7 +436,7 @@ impl BlinkStick {
     ///
     /// # Example
     /// Makes the first led transform from a red color into a green color over a period of five seconds, with 50 color updates.
-    /// ```no_run
+    /// ```
     /// use blinkstick_rs::{BlinkStick, Color};
     ///
     /// let blinkstick = BlinkStick::new();
