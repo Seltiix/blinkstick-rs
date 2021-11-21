@@ -108,11 +108,13 @@ impl BlinkStick {
     ///
     /// # Example
     /// Sets the color of the 0th led to red
-    /// ```no_run
+    /// ```
     /// use blinkstick_rs::{BlinkStick, Color};
     /// let blinkstick = BlinkStick::new();
     ///
     /// blinkstick.set_led_color(0, Color {r: 50, g: 0, b: 0});
+    /// 
+    /// assert_eq!(blinkstick.get_led_color(0), Color {r: 50, g: 0, b: 0});
     /// ```
     pub fn set_led_color(&self, led: u8, color: Color) {
         if led >= self.max_leds {
@@ -273,12 +275,12 @@ impl BlinkStick {
     /// The call to `blink_multiple_leds_color` will panic if any of the specified `leds` is out of bounds for the BlinkStick device.
     ///
     /// # Example
-    /// Makes the 1st, 3rd, 5th led blink 2 times, once every 200 miliseconds, with a yellow glow
+    /// Makes the zeroth and first led blink 2 times, once every 200 miliseconds, with a yellow glow
     /// ```no_run
     /// use blinkstick_rs::{BlinkStick, Color};
     ///
     /// let blinkstick = BlinkStick::new();
-    /// blinkstick.blink_multiple_leds_color(&vec![1, 3, 5], std::time::Duration::from_millis(200), 2, Color {r: 50, g: 50, b: 0});
+    /// blinkstick.blink_multiple_leds_color(&vec![0, 1], std::time::Duration::from_millis(200), 2, Color {r: 50, g: 50, b: 0});
     /// ```
     pub fn blink_multiple_leds_color(
         &self,
@@ -403,7 +405,7 @@ impl BlinkStick {
     /// panics if this threshold is overstepped. A rule of thumb is for each second of animation, 100 steps is a softmax.
     ///
     /// # Example
-    /// Makes every led pulse between beeing turned of and a green color
+    /// Makes every led pulse between beeing turned off and a green color
     /// ```
     /// use blinkstick_rs::{BlinkStick, Color};
     ///
@@ -433,7 +435,7 @@ impl BlinkStick {
     /// panics if this threshold is overstepped. A rule of thumb is for each second of animation, 100 steps is a softmax.
     ///
     /// # Example
-    /// Makes the 1st led transform from a red color into a green color over a period of five seconds, with 50 color updates.
+    /// Makes the first led transform from a red color into a green color over a period of five seconds, with 50 color updates.
     /// ```no_run
     /// use blinkstick_rs::{BlinkStick, Color};
     ///
