@@ -2,6 +2,11 @@
 
 Logs all version updates within the project.
 
+## [0.2.1]
+
+### Changed
+
+- Added a 10 millisecond waiting period between each command when sending multiple commands to the blinkstick
 ## [0.2.0]
 
 ### Added 

@@ -10,6 +10,7 @@ extern crate hidapi;
 
 const VENDOR_ID: u16 = 0x20a0;
 const PRODUCT_ID: u16 = 0x41e5;
+const COM_PAUSE: Duration = Duration::from_millis(10);
 
 const REPORT_ARRAY_BYTES: usize = 100;
 
@@ -121,9 +122,7 @@ impl BlinkStick {
             panic!("Led {} is out of bounds for Blinkstick device", led)
         }
 
-        self.device
-            .send_feature_report(&[0x5, 0, led, color.r, color.g, color.b])
-            .expect("Could not set the color of Blinkstick led");
+        self.send_feature_to_blinkstick(&[0x5, 0, led, color.r, color.g, color.b]);
     }
 
     /// Sets the RGB color of one or more leds to a single color
@@ -164,9 +163,7 @@ impl BlinkStick {
             data_vec[led_offset + 2] = color.b;
         }
 
-        self.device
-            .send_feature_report(&data_vec[0..self.report_length])
-            .expect("Could not set the color of Blinkstick leds");
+        self.send_feature_to_blinkstick(&data_vec[0..self.report_length]);
     }
 
     /// Sets the same color for all leds available on the BlinkStick device
@@ -230,9 +227,7 @@ impl BlinkStick {
             data_vec[led_offset + 2] = colors[led].b;
         }
 
-        self.device
-            .send_feature_report(&data_vec[0..self.report_length])
-            .expect("Could not set the color of Blinkstick leds");
+        self.send_feature_to_blinkstick(&data_vec[0..self.report_length]);
     }
 
     /// Makes a specified led blink in a single color
@@ -411,8 +406,7 @@ impl BlinkStick {
     ///
     /// let blinkstick = BlinkStick::new();
     ///
-    /// let color = Color {r: 0, g: 25, b: 0};
-    /// blinkstick.pulse_all_leds_color(std::time::Duration::from_secs(2), 50, Color {r: 0, g: 25, b: 0});
+    /// blinkstick.pulse_all_leds_color(std::time::Duration::from_secs(2), 25, Color {r: 0, g: 25, b: 0});
     ///
     /// assert_eq!(blinkstick.get_all_led_colors(), vec![Color {r: 0, g: 0, b: 0}; blinkstick.max_leds as usize]);
     /// ```
@@ -497,7 +491,7 @@ impl BlinkStick {
     /// }
     ///
     /// blinkstick.set_all_leds_colors(&colors);
-    /// blinkstick.transform_all_leds_colors(std::time::Duration::from_secs(2), 200, &new_colors);
+    /// blinkstick.transform_all_leds_colors(std::time::Duration::from_secs(2), 50, &new_colors);
     /// ```
     pub fn transform_all_leds_colors(&self, duration: Duration, steps: u64, colors: &Vec<Color>) {
         let interval = duration.as_millis() as u64 / steps;
@@ -556,7 +550,7 @@ impl BlinkStick {
     /// blinkstick.set_all_leds_colors(&colors);
     ///
     /// let led_vec = (0..blinkstick.max_leds).collect();
-    /// blinkstick.transform_multiple_leds_color(&led_vec, std::time::Duration::from_secs(2), 200, Color {r: 55, g: 0, b: 55});
+    /// blinkstick.transform_multiple_leds_color(&led_vec, std::time::Duration::from_secs(2), 50, Color {r: 55, g: 0, b: 55});
     /// ```
     pub fn transform_multiple_leds_color(
         &self,
@@ -614,9 +608,7 @@ impl BlinkStick {
     /// assert_eq!(led_colors[2], random_color);
     /// ```
     pub fn get_all_led_colors(&self) -> Vec<Color> {
-        let mut buf: [u8; REPORT_ARRAY_BYTES] = [0; REPORT_ARRAY_BYTES];
-        buf[0] = 0x6;
-        self.device.get_feature_report(&mut buf).unwrap();
+        let buf = self.get_feature_from_blinkstick(0x6);
 
         let mut led_colors: Vec<Color> = Vec::with_capacity(self.max_leds as usize);
         for led in 0..self.max_leds as usize {
@@ -682,6 +674,25 @@ impl BlinkStick {
         } else {
             color_value - step_size as u8
         }
+    }
+
+    fn send_feature_to_blinkstick(&self, feature: &[u8]) {
+        self.device
+            .send_feature_report(feature)
+            .expect("Could not set the color of Blinkstick led");
+
+        thread::sleep(COM_PAUSE);
+        
+    }
+
+    fn get_feature_from_blinkstick(&self, id: u8) -> [u8; REPORT_ARRAY_BYTES] {
+        let mut buf = [0u8; REPORT_ARRAY_BYTES];
+        buf[0] = id;
+
+        self.device.get_feature_report(&mut buf).unwrap();
+        thread::sleep(COM_PAUSE);
+
+        buf
     }
 }
 
