@@ -19,6 +19,7 @@ pub struct Color {
     pub g: u8,
     pub b: u8,
 }
+const COLOR_OFF: Color = Color {r: 0, g: 0, b: 0};
 
 pub struct BlinkStick {
     device: hidapi::HidDevice,
@@ -28,7 +29,7 @@ pub struct BlinkStick {
 
 impl Drop for BlinkStick {
     fn drop(&mut self) {
-        self.set_all_leds_color(Color { r: 0, g: 0, b: 0 });
+        self.set_all_leds_color(COLOR_OFF);
     }
 }
 
@@ -62,11 +63,16 @@ impl BlinkStick {
         let max_leds = ((bytes_read - 2) / 3) as u8;
         let report_length = ((max_leds * 3) + 2).into();
 
-        BlinkStick {
+        let blinkstick = BlinkStick {
             device,
             max_leds,
             report_length,
-        }
+        };
+
+        // If the light is already on, we want to reset it before giving the user a way to interact with it.
+        blinkstick.set_all_leds_color(COLOR_OFF);
+
+        blinkstick
     }
 
     /// Generates a random color
