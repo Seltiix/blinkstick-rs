@@ -19,7 +19,7 @@ pub struct Color {
     pub g: u8,
     pub b: u8,
 }
-const COLOR_OFF: Color = Color {r: 0, g: 0, b: 0};
+const COLOR_OFF: Color = Color { r: 0, g: 0, b: 0 };
 
 pub struct BlinkStick {
     device: hidapi::HidDevice,
