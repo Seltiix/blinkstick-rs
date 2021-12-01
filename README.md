@@ -58,3 +58,7 @@ blinkstick.transform_led_color(1, std::time::Duration::from_secs(5), 50, Color {
 
 # Running tests
 Tests are only runnable when a BlinkStick device is plugged in. Furthermore, tests should be run using `cargo test -- --test-threads=1` or `cargo test -- --test-threads=1` or they might fail.
+
+# Dependencies
+## Linux
+- libusb - Can be install using for example "apt install usbutils" or "yum install usbutils"

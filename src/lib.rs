@@ -1,6 +1,7 @@
 //! This crate provides a rust toolkit for interacting with the BlinkStick device.
 //! The implementation should support all types of BlinkStick devices. It was however
 //! implemented and tested using a BlinkStick Square. If a BlinkStick device acts incorrectly, please contact me.
+//! Requires libusb when using blinkstick-rs on Linux machines, check README for more information.
 
 use rand::Rng;
 use std::{thread, time::Duration, time::Instant};
@@ -769,7 +770,7 @@ mod blinkstick {
     fn flash_multiple_leds_out_of_bounds() {
         let blinkstick = BlinkStick::new();
 
-        blinkstick.set_multiple_leds_color(&vec![blinkstick.max_leds], Color { r: 5, g: 5, b: 5 });
+        blinkstick.set_multiple_leds_color(&[blinkstick.max_leds], Color { r: 5, g: 5, b: 5 });
     }
 
     #[test]
@@ -822,7 +823,7 @@ mod blinkstick {
         let blinkstick = BlinkStick::new();
 
         blinkstick.blink_multiple_leds_color(
-            &vec![blinkstick.max_leds],
+            &[blinkstick.max_leds],
             std::time::Duration::from_millis(200),
             5,
             Color { r: 5, g: 10, b: 10 },
@@ -867,7 +868,7 @@ mod blinkstick {
         assert_eq!(blinkstick.get_led_color(5), color_two);
 
         blinkstick.transform_multiple_leds_color(
-            &vec![3, 5],
+            &[3, 5],
             std::time::Duration::from_secs(4),
             25,
             target_color,
