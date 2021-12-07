@@ -253,7 +253,7 @@ impl BlinkStick {
     /// * `color` - A struct holding color values for R,G and B channel respectively
     ///
     /// # Panics
-    /// The call to `blink_led_color` will panic if the specifed `led` is out of bounds for the connected BlinkStick device.
+    /// The call to `blink_led_color` will panic if the specified `led` is out of bounds for the connected BlinkStick device.
     ///
     /// # Example
     /// Makes the 0th led blink 5 times, once every second, with a purple glow
@@ -284,7 +284,7 @@ impl BlinkStick {
     /// The call to `blink_multiple_leds_color` will panic if any of the specified `leds` is out of bounds for the BlinkStick device.
     ///
     /// # Example
-    /// Makes the zeroth and first led blink 2 times, once every 200 miliseconds, with a yellow glow
+    /// Makes the zeroth and first led blink 2 times, once every 200 milliseconds, with a yellow glow
     /// ```
     /// use blinkstick_rs::{BlinkStick, Color};
     ///
@@ -314,7 +314,7 @@ impl BlinkStick {
     /// * `color` - A struct holding color values for R,G and B channel respectively
     ///
     /// # Example
-    /// Makes all leds blink 2 times, once every 200 miliseconds, with a yellow glow
+    /// Makes all leds blink 2 times, once every 200 milliseconds, with a yellow glow
     /// ```
     /// use blinkstick_rs::{BlinkStick, Color};
     ///
@@ -335,7 +335,7 @@ impl BlinkStick {
     ///
     ///
     /// # Panics
-    /// The call to `pulse_led_color` will panic if the specifed `led` is out of bounds for the connected BlinkStick device.
+    /// The call to `pulse_led_color` will panic if the specified `led` is out of bounds for the connected BlinkStick device.
     ///
     /// Additionally, by choosing a very high `step` count, it makes the internal animation interval shorter then the function execution
     /// meaning that the animation would have taken longer then the specified duration to finish. Therefore, the function
@@ -415,7 +415,7 @@ impl BlinkStick {
     /// panics if this threshold is overstepped. A rule of thumb is for each second of animation, 100 steps is a softmax.
     ///
     /// # Example
-    /// Makes every led pulse between beeing turned off and a green color
+    /// Makes every led pulse between being turned off and a green color
     /// ```
     /// use blinkstick_rs::{BlinkStick, Color};
     ///
@@ -439,7 +439,7 @@ impl BlinkStick {
     /// * `color` - A struct holding color values for R,G and B channel respectively
     ///
     /// # Panics
-    /// The call to `transform_led_color` will panic if the specifed `led` is out of bounds for the connected BlinkStick device.
+    /// The call to `transform_led_color` will panic if the specified `led` is out of bounds for the connected BlinkStick device.
     ///
     /// Additionally, by choosing a very high `step` count, it makes the internal animation interval shorter then the function execution
     /// meaning that the animation would have taken longer then the specified duration to finish. Therefore, the function
@@ -470,7 +470,7 @@ impl BlinkStick {
             let elapsed = start.elapsed().as_millis() as u64;
 
             if elapsed > interval {
-                panic!("Executing a single color move took {} miliseconds, whilst the interval is set to {} miliseconds. Please reduce the number steps or increase the animation time.", elapsed, interval)
+                panic!("Executing a single color move took {} milliseconds, whilst the interval is set to {} milliseconds. Please reduce the number steps or increase the animation time.", elapsed, interval)
             }
 
             std::thread::sleep(Duration::from_millis(interval - elapsed));

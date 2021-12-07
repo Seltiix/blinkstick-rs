@@ -27,7 +27,7 @@ for led in 0..blinkstick.max_leds as usize {
 blinkstick.set_all_leds_colors(&colors);
 ```
 
-Makes the 1st, 3rd, 5th led blink 2 times, once every 200 miliseconds, with a yellow glow
+Makes the 1st, 3rd, 5th LED blink 2 times, once every 200 milliseconds, with a yellow glow
 ```rust
 use blinkstick_rs::{BlinkStick, Color};
 
@@ -36,7 +36,7 @@ let blinkstick = BlinkStick::new();
 blinkstick.blink_multiple_leds_color(&vec![1, 3, 5], std::time::Duration::from_millis(200), 2, Color {r: 50, g: 50, b: 0});
 ```
 
-Makes every led pulse between beeing turned off and a green color
+Makes every led pulse between being turned off and a green color
 ```rust
 use blinkstick_rs::{BlinkStick, Color};
 
@@ -57,8 +57,8 @@ blinkstick.transform_led_color(1, std::time::Duration::from_secs(5), 50, Color {
 ```
 
 # Running tests
-Tests are only runnable when a BlinkStick device is plugged in. Furthermore, tests should be run using `cargo test -- --test-threads=1` or `cargo test -- --test-threads=1` or they might fail.
+Tests are only runnable when a BlinkStick device is plugged in. Furthermore, tests should be run using `cargo test -- --test-threads=1` or they might fail.
 
 # Dependencies
 ## Linux
-- libusb - Can be install using for example "apt install usbutils" or "yum install usbutils"
+- libusb - Can be installed using for example "apt install usbutils" or "yum install usbutils"
