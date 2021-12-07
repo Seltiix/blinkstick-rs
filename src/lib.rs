@@ -4,13 +4,13 @@
 //! Requires libusb when using blinkstick-rs on Linux machines, check README for more information.
 
 use rand::Rng;
-use std::{thread, time::Duration, time::Instant};
+use std::ops::{Div, Sub};
+use std::{time::Duration, time::Instant};
 
 extern crate hidapi;
 
 const VENDOR_ID: u16 = 0x20a0;
 const PRODUCT_ID: u16 = 0x41e5;
-const COM_PAUSE: Duration = Duration::from_millis(2);
 
 const REPORT_ARRAY_BYTES: usize = 100;
 
@@ -117,7 +117,7 @@ impl BlinkStick {
     /// * `color` - A struct holding color values for R,G and B channel respectively
     ///
     /// # Panics
-    /// The call to `set_led_color` will panic if the specifed `led` is out of bounds for the connected BlinkStick device.
+    /// The call to `set_led_color` will panic if the specified `led` is out of bounds for the connected BlinkStick device.
     ///
     /// # Example
     /// Sets the color of the 0th led to red
@@ -169,7 +169,6 @@ impl BlinkStick {
                 );
             }
 
-            // Why whould G,R,B ever be a good idea?
             data_vec[led_offset] = color.g;
             data_vec[led_offset + 1] = color.r;
             data_vec[led_offset + 2] = color.b;
@@ -235,7 +234,6 @@ impl BlinkStick {
                 );
             }
 
-            // Why whould G,R,B ever be a good idea?
             data_vec[led_offset] = led_color.g;
             data_vec[led_offset + 1] = led_color.r;
             data_vec[led_offset + 2] = led_color.b;
@@ -454,26 +452,36 @@ impl BlinkStick {
     /// blinkstick.set_led_color(1, Color {r: 50, g: 0, b: 0});
     /// blinkstick.transform_led_color(1, std::time::Duration::from_secs(5), 50, Color {r: 0, g: 50, b: 0});
     /// ```
-    pub fn transform_led_color(&self, led: u8, duration: Duration, steps: u64, color: Color) {
-        let interval = duration.as_millis() as u64 / steps;
-        for step in 0..steps {
+    pub fn transform_led_color(
+        &self,
+        led: u8,
+        duration: Duration,
+        steps: u64,
+        target_color: Color,
+    ) {
+        let interval = duration.div(steps as u32);
+        let start_led_color = self.get_led_color(led);
+
+        let gradient: Vec<Color> = calculate_gradients(start_led_color, target_color, steps);
+
+        let mut warn = false;
+        let start = std::time::Instant::now();
+        for color in gradient {
             let start = Instant::now();
-            let led_color = self.get_led_color(led);
-
-            let new_color = Color {
-                r: self.move_color(led_color.r, color.r, step, steps),
-                g: self.move_color(led_color.g, color.g, step, steps),
-                b: self.move_color(led_color.b, color.b, step, steps),
-            };
-
-            self.set_led_color(led, new_color);
-            let elapsed = start.elapsed().as_millis() as u64;
+            self.set_led_color(led, color);
+            let elapsed = start.elapsed();
 
             if elapsed > interval {
-                panic!("Executing a single color move took {} milliseconds, whilst the interval is set to {} milliseconds. Please reduce the number steps or increase the animation time.", elapsed, interval)
+                if !warn {
+                    warn = true; // If it takes longer to set the color then the proposed interval, we warn the user
+                }
+            } else {
+                std::thread::sleep(interval.sub(elapsed));
             }
-
-            std::thread::sleep(Duration::from_millis(interval - elapsed));
+        }
+        let elapsed = start.elapsed();
+        if warn {
+            println!("Color transform took {:?} compared to the requested {:?}. Consider reducing the amount of steps or increasing the animation time", elapsed, duration);
         }
     }
 
@@ -530,7 +538,7 @@ impl BlinkStick {
             let elapsed = start.elapsed().as_millis() as u64;
 
             if elapsed > interval {
-                panic!("Executing a single color move took {} miliseconds, whilst the interval is set to {} miliseconds. Please reduce the number steps or increase the animation time.", elapsed, interval)
+                panic!("Executing a single color move took {} milliseconds, whilst the interval is set to {} milliseconds. Please reduce the number steps or increase the animation time.", elapsed, interval)
             }
 
             std::thread::sleep(Duration::from_millis(interval - elapsed));
@@ -595,7 +603,7 @@ impl BlinkStick {
             let elapsed = start.elapsed().as_millis() as u64;
 
             if elapsed > interval {
-                panic!("Executing a single color move took {} miliseconds, whilst the interval is set to {} miliseconds. Please reduce the number steps or increase the animation time.", elapsed, interval)
+                panic!("Executing a single color move took {} milliseconds, whilst the interval is set to {} milliseconds. Please reduce the number steps or increase the animation time.", elapsed, interval)
             }
 
             std::thread::sleep(Duration::from_millis(interval - elapsed));
@@ -673,7 +681,7 @@ impl BlinkStick {
         colors[led as usize]
     }
 
-    // Shifts a color value a single step in the direction of the targe, depending on the amount of remaining steps
+    // Shifts a color value a single step in the direction of the target, depending on the amount of remaining steps
     fn move_color(&self, color_value: u8, target_value: u8, step: u64, steps: u64) -> u8 {
         let diff;
         let ascending = color_value <= target_value;
@@ -697,8 +705,6 @@ impl BlinkStick {
         self.device
             .send_feature_report(feature)
             .expect("Could not set the color of Blinkstick led");
-
-        thread::sleep(COM_PAUSE);
     }
 
     fn get_feature_from_blinkstick(&self, id: u8) -> [u8; REPORT_ARRAY_BYTES] {
@@ -706,10 +712,26 @@ impl BlinkStick {
         buf[0] = id;
 
         self.device.get_feature_report(&mut buf).unwrap();
-        thread::sleep(COM_PAUSE);
 
         buf
     }
+}
+
+fn calculate_gradients(start_color: Color, target_color: Color, steps: u64) -> Vec<Color> {
+    (1..=steps)
+        .into_iter()
+        .map(|step| {
+            let step_percent = step as f32 / steps as f32;
+            Color {
+                r: ((start_color.r as f32 * (1.0 - step_percent))
+                    + (target_color.r as f32 * step_percent)) as u8,
+                g: ((start_color.g as f32 * (1.0 - step_percent))
+                    + (target_color.g as f32 * step_percent)) as u8,
+                b: ((start_color.b as f32 * (1.0 - step_percent))
+                    + (target_color.b as f32 * step_percent)) as u8,
+            }
+        })
+        .collect()
 }
 
 #[cfg(test)]
