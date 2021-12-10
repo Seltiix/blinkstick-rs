@@ -289,13 +289,7 @@ impl BlinkStick {
     /// let blinkstick = BlinkStick::new();
     /// blinkstick.blink_multiple_leds_color(&vec![0, 1], std::time::Duration::from_millis(200), 2, Color {r: 50, g: 50, b: 0});
     /// ```
-    pub fn blink_multiple_leds_color(
-        &self,
-        leds: &[u8],
-        delay: Duration,
-        blinks: u32,
-        color: Color,
-    ) {
+    pub fn blink_multiple_leds_color(&self, leds: &[u8], delay: Duration, blinks: u32, color: Color) {
         for _ in 0..blinks {
             self.set_multiple_leds_color(leds, color);
             std::thread::sleep(delay);
@@ -387,13 +381,7 @@ impl BlinkStick {
     /// assert_eq!(blinkstick.get_led_color(0), colors[0]);
     /// assert_eq!(blinkstick.get_led_color(4), colors[4]);
     /// ```
-    pub fn pulse_multiple_leds_color(
-        &self,
-        leds: &[u8],
-        duration: Duration,
-        steps: u64,
-        color: Color,
-    ) {
+    pub fn pulse_multiple_leds_color(&self, leds: &[u8], duration: Duration, steps: u64, color: Color) {
         let old_colors = self.get_all_led_colors();
 
         self.transform_multiple_leds_color(leds, duration / 2, steps, color);
@@ -452,19 +440,12 @@ impl BlinkStick {
     /// blinkstick.set_led_color(1, Color {r: 50, g: 0, b: 0});
     /// blinkstick.transform_led_color(1, std::time::Duration::from_secs(5), 50, Color {r: 0, g: 50, b: 0});
     /// ```
-    pub fn transform_led_color(
-        &self,
-        led: u8,
-        duration: Duration,
-        steps: u64,
-        target_color: Color,
-    ) {
+    pub fn transform_led_color(&self, led: u8, duration: Duration, steps: u64, target_color: Color) {
         let interval = duration.div(steps as u32);
         let start_led_color = self.get_led_color(led);
 
         let gradient: Vec<Color> = calculate_gradients(start_led_color, target_color, steps);
 
-        let start = std::time::Instant::now();
         for color in gradient {
             let start = Instant::now();
             self.set_led_color(led, color);
@@ -488,7 +469,7 @@ impl BlinkStick {
     /// meaning that the animation would have taken longer then the specified duration to finish. Therefore, the function
     /// panics if this threshold is overstepped. A rule of thumb is for each second of animation, 100 steps is a softmax.
     ///     
-    //// # Example
+    /// # Example
     /// Sets a random color for each available led then transforms each individual led into a different random `Color`.
     /// ```
     /// use blinkstick_rs::{BlinkStick, Color};
@@ -508,29 +489,26 @@ impl BlinkStick {
     /// blinkstick.transform_all_leds_colors(std::time::Duration::from_secs(2), 50, &new_colors);
     /// ```
     pub fn transform_all_leds_colors(&self, duration: Duration, steps: u64, colors: &[Color]) {
-        let interval = duration.as_millis() as u64 / steps;
+        let interval = duration.div(steps as u32);
+
+        let mut led_gradients: Vec<Color> = Vec::with_capacity((self.max_leds as u64 * steps) as usize);
+        for (led, target_color) in colors.iter().enumerate().take(self.max_leds as usize) {
+            let current_led_color = self.get_led_color(led as u8);
+            led_gradients.append(&mut calculate_gradients(current_led_color, *target_color, steps));
+        }
 
         for step in 0..steps {
             let start = Instant::now();
 
-            let mut led_colors = self.get_all_led_colors();
-            for led in 0..self.max_leds as usize {
-                let led_color = &mut led_colors[led as usize];
+            let test: Vec<Color> = led_gradients
+                .iter()
+                .skip(step as usize)
+                .step_by(steps as usize)
+                .copied()
+                .collect();
+            self.set_all_leds_colors(&test);
 
-                led_color.r = self.move_color(led_color.r, colors[led].r, step, steps);
-                led_color.g = self.move_color(led_color.g, colors[led].g, step, steps);
-                led_color.b = self.move_color(led_color.b, colors[led].b, step, steps);
-            }
-
-            self.set_all_leds_colors(&led_colors);
-
-            let elapsed = start.elapsed().as_millis() as u64;
-
-            if elapsed > interval {
-                panic!("Executing a single color move took {} milliseconds, whilst the interval is set to {} milliseconds. Please reduce the number steps or increase the animation time.", elapsed, interval)
-            }
-
-            std::thread::sleep(Duration::from_millis(interval - elapsed));
+            std::thread::sleep(interval.sub(start.elapsed()));
         }
     }
 
@@ -566,36 +544,24 @@ impl BlinkStick {
     /// let led_vec: Vec<u8> = (0..blinkstick.max_leds).collect();
     /// blinkstick.transform_multiple_leds_color(&led_vec, std::time::Duration::from_secs(2), 50, Color {r: 55, g: 0, b: 55});
     /// ```
-    pub fn transform_multiple_leds_color(
-        &self,
-        leds: &[u8],
-        duration: Duration,
-        steps: u64,
-        color: Color,
-    ) {
-        let interval = duration.as_millis() as u64 / steps;
+    pub fn transform_multiple_leds_color(&self, leds: &[u8], duration: Duration, steps: u64, target_color: Color) {
+        let interval = duration.div(steps as u32);
 
-        for step in 0..steps {
+        let mut led_gradients: Vec<Color> = Vec::with_capacity((leds.len() * steps as usize) as usize);
+        for led in leds.iter() {
+            let current_led_color = self.get_led_color(*led);
+            led_gradients.append(&mut calculate_gradients(current_led_color, target_color, steps));
+        }
+
+        for step in 0..steps as usize {
             let start = Instant::now();
-
-            let mut led_colors = self.get_all_led_colors();
-            for led in leds {
-                let led_color = &mut led_colors[*led as usize];
-
-                led_color.r = self.move_color(led_color.r, color.r, step, steps);
-                led_color.g = self.move_color(led_color.g, color.g, step, steps);
-                led_color.b = self.move_color(led_color.b, color.b, step, steps);
+            let mut all_led_colors = self.get_all_led_colors();
+            for (index, led) in leds.iter().enumerate() {
+                all_led_colors[*led as usize] = led_gradients[index * steps as usize + step];
             }
+            self.set_all_leds_colors(&all_led_colors);
 
-            self.set_all_leds_colors(&led_colors);
-
-            let elapsed = start.elapsed().as_millis() as u64;
-
-            if elapsed > interval {
-                panic!("Executing a single color move took {} milliseconds, whilst the interval is set to {} milliseconds. Please reduce the number steps or increase the animation time.", elapsed, interval)
-            }
-
-            std::thread::sleep(Duration::from_millis(interval - elapsed));
+            std::thread::sleep(interval.sub(start.elapsed()));
         }
     }
 
@@ -670,31 +636,10 @@ impl BlinkStick {
         colors[led as usize]
     }
 
-    // Shifts a color value a single step in the direction of the target, depending on the amount of remaining steps
-    fn move_color(&self, color_value: u8, target_value: u8, step: u64, steps: u64) -> u8 {
-        let diff;
-        let ascending = color_value <= target_value;
-
-        if ascending {
-            diff = target_value - color_value;
-        } else {
-            diff = color_value - target_value;
-        }
-
-        let step_size = diff as u64 / (steps - step);
-
-        if ascending {
-            color_value + step_size as u8
-        } else {
-            color_value - step_size as u8
-        }
-    }
-
     fn send_feature_to_blinkstick(&self, feature: &[u8]) {
         loop {
-            match self.device.send_feature_report(feature) {
-                Ok(_) => return,
-                Err(_) => (),
+            if self.device.send_feature_report(feature).is_ok() {
+                return;
             }
         }
     }
@@ -704,9 +649,8 @@ impl BlinkStick {
         buf[0] = id;
 
         loop {
-            match self.device.get_feature_report(&mut buf) {
-                Ok(_) => return buf,
-                Err(_) => (),
+            if self.device.get_feature_report(&mut buf).is_ok() {
+                return buf;
             }
         }
     }
@@ -718,12 +662,9 @@ fn calculate_gradients(start_color: Color, target_color: Color, steps: u64) -> V
         .map(|step| {
             let step_percent = step as f32 / steps as f32;
             Color {
-                r: ((start_color.r as f32 * (1.0 - step_percent))
-                    + (target_color.r as f32 * step_percent)) as u8,
-                g: ((start_color.g as f32 * (1.0 - step_percent))
-                    + (target_color.g as f32 * step_percent)) as u8,
-                b: ((start_color.b as f32 * (1.0 - step_percent))
-                    + (target_color.b as f32 * step_percent)) as u8,
+                r: ((start_color.r as f32 * (1.0 - step_percent)) + (target_color.r as f32 * step_percent)) as u8,
+                g: ((start_color.g as f32 * (1.0 - step_percent)) + (target_color.g as f32 * step_percent)) as u8,
+                b: ((start_color.b as f32 * (1.0 - step_percent)) + (target_color.b as f32 * step_percent)) as u8,
             }
         })
         .collect()
@@ -794,11 +735,7 @@ mod blinkstick {
     fn blink_led_color() {
         let blinkstick = BlinkStick::new();
 
-        let blink_led_color = Color {
-            r: 25,
-            g: 65,
-            b: 100,
-        };
+        let blink_led_color = Color { r: 25, g: 65, b: 100 };
         blinkstick.blink_led_color(3, std::time::Duration::from_millis(200), 5, blink_led_color);
 
         assert_eq!(blinkstick.get_led_color(3), Color { r: 0, g: 0, b: 0 });
@@ -808,11 +745,7 @@ mod blinkstick {
     fn blink_all_leds_color() {
         let blinkstick = BlinkStick::new();
 
-        let blink_led_color = Color {
-            r: 25,
-            g: 65,
-            b: 100,
-        };
+        let blink_led_color = Color { r: 25, g: 65, b: 100 };
         blinkstick.blink_all_leds_color(std::time::Duration::from_millis(200), 5, blink_led_color);
 
         assert_eq!(
@@ -851,11 +784,7 @@ mod blinkstick {
     fn transform_led_color() {
         let blinkstick = BlinkStick::new();
 
-        let from_color = Color {
-            r: 150,
-            g: 150,
-            b: 150,
-        };
+        let from_color = Color { r: 150, g: 150, b: 150 };
         let to_color = Color { r: 0, g: 0, b: 0 };
 
         blinkstick.set_led_color(2, from_color);
@@ -870,11 +799,7 @@ mod blinkstick {
         let blinkstick = BlinkStick::new();
 
         let color_one = Color { r: 5, g: 5, b: 75 };
-        let color_two = Color {
-            r: 60,
-            g: 111,
-            b: 5,
-        };
+        let color_two = Color { r: 60, g: 111, b: 5 };
 
         let target_color = Color { r: 100, g: 0, b: 0 };
 
@@ -884,12 +809,7 @@ mod blinkstick {
         assert_eq!(blinkstick.get_led_color(3), color_one);
         assert_eq!(blinkstick.get_led_color(5), color_two);
 
-        blinkstick.transform_multiple_leds_color(
-            &[3, 5],
-            std::time::Duration::from_secs(4),
-            25,
-            target_color,
-        );
+        blinkstick.transform_multiple_leds_color(&[3, 5], std::time::Duration::from_secs(4), 25, target_color);
 
         assert_eq!(blinkstick.get_led_color(3), target_color);
         assert_eq!(blinkstick.get_led_color(5), target_color);
