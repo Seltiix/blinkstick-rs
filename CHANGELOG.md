@@ -23,6 +23,16 @@ Logs all version updates within the project.
 - Reduced the sleep timer between device gets/sets from 10 milliseconds to 2 milliseconds
 
 
+## [0.2.2]
+
+### Added
+- Implemented Default for BlinkStick
+- Light resets to an off-state when creating a new BlinkStick object
+
+### Changed
+- Reduced the sleep timer between device gets/sets from 10 milliseconds to 2 milliseconds
+
+
 ## [0.2.1]
 
 ### Changed

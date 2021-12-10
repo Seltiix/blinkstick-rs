@@ -233,7 +233,7 @@ impl BlinkStick {
                     self.max_leds - 1
                 );
             }
-
+          
             data_vec[led_offset] = led_color.g;
             data_vec[led_offset + 1] = led_color.r;
             data_vec[led_offset + 2] = led_color.b;
@@ -842,7 +842,7 @@ mod blinkstick {
 
         assert_eq!(blinkstick.get_led_color(3), color_one);
         assert_eq!(blinkstick.get_led_color(5), color_two);
-
+      
         blinkstick.transform_multiple_leds_color(&[3, 5], std::time::Duration::from_secs(4), 25, target_color);
 
         assert_eq!(blinkstick.get_led_color(3), target_color);
