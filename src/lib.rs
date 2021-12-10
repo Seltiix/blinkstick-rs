@@ -76,6 +76,21 @@ impl BlinkStick {
         blinkstick
     }
 
+    /// Turns of a single led
+    pub fn turn_off_led(&self, led: u8) {
+        self.set_led_color(led, COLOR_OFF);
+    }
+
+    /// Turns of multiple leds
+    pub fn turn_off_multiple_leds(&self, leds: &[u8]) {
+        self.set_multiple_leds_color(leds, COLOR_OFF);
+    }
+
+    /// Turns of all leds
+    pub fn turn_off_all_leds(&self) {
+        self.set_all_leds_color(COLOR_OFF);
+    }
+
     /// Generates a random color
     ///
     /// # Example
