@@ -464,24 +464,13 @@ impl BlinkStick {
 
         let gradient: Vec<Color> = calculate_gradients(start_led_color, target_color, steps);
 
-        let mut warn = false;
         let start = std::time::Instant::now();
         for color in gradient {
             let start = Instant::now();
             self.set_led_color(led, color);
             let elapsed = start.elapsed();
 
-            if elapsed > interval {
-                if !warn {
-                    warn = true; // If it takes longer to set the color then the proposed interval, we warn the user
-                }
-            } else {
-                std::thread::sleep(interval.sub(elapsed));
-            }
-        }
-        let elapsed = start.elapsed();
-        if warn {
-            println!("Color transform took {:?} compared to the requested {:?}. Consider reducing the amount of steps or increasing the animation time", elapsed, duration);
+            std::thread::sleep(interval.sub(elapsed));
         }
     }
 
@@ -702,18 +691,24 @@ impl BlinkStick {
     }
 
     fn send_feature_to_blinkstick(&self, feature: &[u8]) {
-        self.device
-            .send_feature_report(feature)
-            .expect("Could not set the color of Blinkstick led");
+        loop {
+            match self.device.send_feature_report(feature) {
+                Ok(_) => return,
+                Err(_) => (),
+            }
+        }
     }
 
     fn get_feature_from_blinkstick(&self, id: u8) -> [u8; REPORT_ARRAY_BYTES] {
         let mut buf = [0u8; REPORT_ARRAY_BYTES];
         buf[0] = id;
 
-        self.device.get_feature_report(&mut buf).unwrap();
-
-        buf
+        loop {
+            match self.device.get_feature_report(&mut buf) {
+                Ok(_) => return buf,
+                Err(_) => (),
+            }
+        }
     }
 }
 
