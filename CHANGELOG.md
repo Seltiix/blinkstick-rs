@@ -1,6 +1,17 @@
 # Changelog
 
 Logs all version updates within the project.
+## [0.2.3]
+
+### Added
+- `transform_all_leds_color` function that transforms all leds to a single color
+
+### Changed
+- All `transform` family functions now utilizes the new `calculate_gradients` function
+- The variable `steps` is now of size u16 instead of u64
+
+### Removed
+- Removed the short sleep between feature sets/gets, improves the animation performance
 
 ## [0.2.2]
 
