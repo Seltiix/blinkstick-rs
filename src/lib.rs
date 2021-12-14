@@ -29,7 +29,7 @@ pub enum FeatureErrorType {
 
 impl std::fmt::Display for FeatureError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Could not send feature to BlinkStick")
+        write!(f, "Could not communicate feature from/to BlinkStick")
     }
 }
 
