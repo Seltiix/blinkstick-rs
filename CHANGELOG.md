@@ -1,6 +1,37 @@
 # Changelog
 
 Logs all version updates within the project.
+## [0.2.3]
+
+### Added
+- `transform_all_leds_color` function that transforms all leds to a single color
+
+### Changed
+- All `transform` family functions now utilizes the new `calculate_gradients` function
+- The variable `steps` is now of size u16 instead of u64
+
+### Removed
+- Removed the short sleep between feature sets/gets, improves the animation performance
+
+## [0.2.2]
+
+### Added
+- Implemented Default for BlinkStick
+- Light resets to an off-state when creating a new BlinkStick object
+
+### Changed
+- Reduced the sleep timer between device gets/sets from 10 milliseconds to 2 milliseconds
+
+
+## [0.2.2]
+
+### Added
+- Implemented Default for BlinkStick
+- Light resets to an off-state when creating a new BlinkStick object
+
+### Changed
+- Reduced the sleep timer between device gets/sets from 10 milliseconds to 2 milliseconds
+
 
 ## [0.3.0]
 

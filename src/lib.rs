@@ -899,7 +899,6 @@ mod blinkstick {
         blinkstick
             .blink_all_leds_color(std::time::Duration::from_millis(200), 5, blink_led_color)
             .expect("Could not blink leds");
-
         assert_eq!(
             blinkstick.get_all_led_colors().expect("Could not get led colors"),
             vec![Color { r: 0, g: 0, b: 0 }; blinkstick.max_leds as usize]
@@ -975,7 +974,6 @@ mod blinkstick {
         blinkstick
             .transform_multiple_leds_color(&[3, 5], std::time::Duration::from_secs(4), 25, target_color)
             .expect("Could not transform leds");
-
         assert_eq!(
             blinkstick.get_led_color(3).expect("Could not get led color"),
             target_color
