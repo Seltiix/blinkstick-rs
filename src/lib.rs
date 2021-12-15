@@ -47,11 +47,11 @@ pub struct BlinkStick {
     report_length: usize,
 }
 
-// impl Drop for BlinkStick {
-//     fn drop(&mut self) {
-//         self.set_all_leds_color(COLOR_OFF).unwrap()
-//     }
-// }
+impl Drop for BlinkStick {
+    fn drop(&mut self) {
+        self.set_all_leds_color(COLOR_OFF).unwrap()
+    }
+}
 
 impl Default for BlinkStick {
     fn default() -> Self {
