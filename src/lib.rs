@@ -378,10 +378,7 @@ impl BlinkStick {
     ///
     /// # Panics
     /// The call to `pulse_led_color` will panic if the specified `led` is out of bounds for the connected BlinkStick device.
-    ///
-    /// Additionally, by choosing a very high `step` count, it makes the internal animation interval shorter then the function execution
-    /// meaning that the animation would have taken longer then the specified duration to finish. Therefore, the function
-    /// panics if this threshold is overstepped. A rule of thumb is for each second of animation, 50 steps is a softmax.
+    /// The call to `pulse_led_color` will panic if the internal communication time is shorter then `duration`/`steps`.
     ///
     /// # Example
     /// Makes the 2nd led, pulse from an off state, to a blue glow, and then return back again to the off state with a two second animation time
@@ -409,10 +406,7 @@ impl BlinkStick {
     ///
     /// # Panics
     /// The call to `pulse_multiple_leds_color` will panic if any of the specified `leds` is out of bounds for the BlinkStick device.
-    ///
-    /// Additionally, by choosing a very high `step` count, it makes the internal animation interval shorter then the function execution
-    /// meaning that the animation would have taken longer then the specified duration to finish. Therefore, the function
-    /// panics if this threshold is overstepped. A rule of thumb is for each second of animation, 100 steps is a softmax.
+    /// The call to `pulse_multiple_leds_color` will panic if the internal communication time is shorter then `duration`/`steps`.
     ///
     /// # Example
     /// Gives the zeroth and fourth led a random color, and makes them pulse to a blue color
@@ -454,9 +448,7 @@ impl BlinkStick {
     /// * `color` - A struct holding color values for R,G and B channel respectively
     ///
     /// # Panics
-    /// By choosing a very high `step` count, it makes the internal animation interval shorter then the function execution
-    /// meaning that the animation would have taken longer then the specified duration to finish. Therefore, the function
-    /// panics if this threshold is overstepped. A rule of thumb is for each second of animation, 100 steps is a softmax.
+    /// The call to `pulse_all_leds_color` will panic if the internal communication time is shorter then `duration`/`steps`.
     ///
     /// # Example
     /// Makes every led pulse between being turned off and a green color
@@ -490,6 +482,7 @@ impl BlinkStick {
     ///
     /// # Panics
     /// The call to `transform_led_color` will panic if the specified `led` is out of bounds for the connected BlinkStick device.
+    /// The call to `transform_led_color` will panic if the internal communication time is shorter then `duration`/`steps`.
     ///
     /// Additionally, by choosing a very high `step` count, it makes the internal animation interval shorter then the function execution
     /// meaning that the animation would have taken longer then the specified duration to finish. Therefore, the function
@@ -535,7 +528,7 @@ impl BlinkStick {
     /// * `colors` - A vector of `Color` with equal length to the number of leds available on the device.
     ///
     /// # Panics
-    /// The call to `blink_multiple_leds_color` will panic if any of the specified `leds` is out of bounds for the BlinkStick device.
+    /// The call to `transform_all_leds_colors` will panic if the internal communication time is shorter then `duration`/`steps`.
     ///
     /// Additionally, by choosing a very high `step` count, it makes the internal animation interval shorter then the function execution
     /// meaning that the animation would have taken longer then the specified duration to finish. Therefore, the function
@@ -582,9 +575,8 @@ impl BlinkStick {
     /// * `steps` - The number of times the color value is update during the transformation
     /// * `color` - A struct holding color values for R,G and B channel respectively
     ///
-    /// Additionally, by choosing a very high `step` count, it makes the internal animation interval shorter then the function execution
-    /// meaning that the animation would have taken longer then the specified duration to finish. A rule of thumb is for each second of animation, 100 steps is a softmax.
-    /// However, using more then 50-75 steps is visually redundant.
+    /// # Panics
+    /// The call to `transform_all_leds_color` will panic if the internal communication time is shorter then `duration`/`steps`.
     ///
     /// # Example
     /// Transforms all leds from "off" to a blue `Color`.
@@ -638,11 +630,8 @@ impl BlinkStick {
     /// * `color` - A struct holding color values for R,G and B channel respectively
     ///
     /// # Panics
-    /// The call to `blink_multiple_leds_color` will panic if any of the specified `leds` is out of bounds for the BlinkStick device.
-    ///
-    /// Additionally, by choosing a very high `step` count, it makes the internal animation interval shorter then the function execution
-    /// meaning that the animation would have taken longer then the specified duration to finish. Therefore, the function
-    /// panics if this threshold is overstepped. A rule of thumb is for each second of animation, 100 steps is a softmax.
+    /// The call to `transform_multiple_leds_color` will panic if any of the specified `leds` is out of bounds for the BlinkStick device.
+    /// The call to `transform_multiple_leds_color` will panic if the internal communication time is shorter then `duration`/`steps`.
     ///
     /// # Example
     /// Sets a random color for each available led then transforms it all into a single `Color`.
@@ -692,9 +681,6 @@ impl BlinkStick {
 
     /// Gets the color of every single led on the BlinkStick device
     ///
-    /// # Panics
-    /// If the BlinkStick device data could not be read
-    ///
     /// # Example
     /// Gets the color of every single led
     /// ```
@@ -729,9 +715,6 @@ impl BlinkStick {
     }
 
     /// Gets the color of a single led on the BlinkStick device
-    ///
-    /// # Panics
-    /// If the BlinkStick device data could not be read
     ///
     /// # Example
     /// Gets the color of the zeroth led
