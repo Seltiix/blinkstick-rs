@@ -1,6 +1,6 @@
 [package]
 name = "blinkstick-rs"
-version = "0.2.4"
+version = "0.3.0"
 authors = ["Seltiix <seltiix@outlook.com>"]
 edition = "2018"
 description = "A library for interacting with any BlinkStick device"
