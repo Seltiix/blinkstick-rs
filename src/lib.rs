@@ -679,13 +679,43 @@ impl BlinkStick {
         Ok(())
     }
 
-    /// Makes the blinkstick device carousel. A Carousel utilizes all leds to transition between `start_color` and `stop_color`
+    /// Makes the blinkstick device carousel. A Carousel utilizes all leds to transition between `start_color`, `stop_color` and back to `start_color`
     ///
     /// # Arguments
     /// * `start_color` - The start color to transition from
     /// * `stop_color` - The target color to transition to
-    pub fn carousel(&self, _start_color: Color, _stop_color: Color) -> Result<(), FeatureError> {
-        todo!()
+    ///
+    /// # Example
+    ///
+    /// Carousels the BlinkStick device Blue -> Green -> Blue 10 times
+    /// ```
+    /// use blinkstick_rs::{BlinkStick, Color};
+    /// let blinkstick = BlinkStick::default();
+    /// let color_one = Color { r: 0, g: 0, b: 50 };
+    /// let color_two = Color {r: 0, g: 50, b: 0};
+    /// for _ in 0..10 {
+    ///     blinkstick.carousel(color_one, color_two, std::time::Duration::from_millis(20)).unwrap();
+    /// }
+    /// ```
+    pub fn carousel(&self, start_color: Color, target_color: Color, delay: Duration) -> Result<(), FeatureError> {
+        let mut carousel_colors = calculate_gradients(start_color, target_color, self.max_leds as u16);
+
+        self.color_lap(&carousel_colors, &delay)?;
+        carousel_colors.reverse();
+        self.color_lap(&carousel_colors, &delay)
+    }
+
+    /// Helper function for carousel
+    fn color_lap(&self, lap_colors: &[Color], delay: &Duration) -> Result<(), FeatureError> {
+        self.set_led_color(0_u8, lap_colors[0])?;
+        for i in 1..self.max_leds {
+            std::thread::sleep(*delay);
+
+            self.turn_off_led(i - 1)?;
+            self.set_led_color(i, lap_colors[i as usize])?;
+        }
+
+        self.turn_off_led(self.max_leds - 1)
     }
 
     /// Gets the color of every single led on the BlinkStick device
