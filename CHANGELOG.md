@@ -3,6 +3,8 @@
 Logs all version updates within the project.
 ## [0.3.1]
 
+### Added
+- A `carousel` function that uses all available leds on the BlinkStick device to transition between two specified Colors
 ### Changed
 - Reintroduced the Drop trait
 

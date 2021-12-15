@@ -679,6 +679,15 @@ impl BlinkStick {
         Ok(())
     }
 
+    /// Makes the blinkstick device carousel. A Carousel utilizes all leds to transition between `start_color` and `stop_color`
+    ///
+    /// # Arguments
+    /// * `start_color` - The start color to transition from
+    /// * `stop_color` - The target color to transition to
+    pub fn carousel(&self, _start_color: Color, _stop_color: Color) -> Result<(), FeatureError> {
+        todo!()
+    }
+
     /// Gets the color of every single led on the BlinkStick device
     ///
     /// # Example
