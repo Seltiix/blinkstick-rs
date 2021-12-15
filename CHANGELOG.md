@@ -1,6 +1,15 @@
 # Changelog
 
 Logs all version updates within the project.
+
+## [0.3.0]
+
+### Added
+- New "turn off" function family for a single, multiple or all leds
+
+### Changed
+- Functions now return Results, to give the user more flexibility during development
+
 ## [0.2.3]
 
 ### Added
