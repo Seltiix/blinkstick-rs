@@ -1,9 +1,11 @@
 # Changelog
 
 Logs all version updates within the project.
+
 ## [0.3.2]
 ### Changed
 - Implemented std::error::Error for FeatureError
+
 ## [0.3.1]
 
 ### Added
