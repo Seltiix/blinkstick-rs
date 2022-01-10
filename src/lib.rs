@@ -514,7 +514,10 @@ impl BlinkStick {
             self.set_led_color(led, color)?;
             let elapsed = start.elapsed();
 
-            std::thread::sleep(interval.sub(elapsed));
+            let subtracted_duration = interval.saturating_sub(elapsed);
+            if subtracted_duration != Duration::ZERO {
+                std::thread::sleep(subtracted_duration);
+            }
         }
 
         Ok(())
@@ -615,7 +618,10 @@ impl BlinkStick {
                 .collect();
             self.set_all_leds_colors(&test)?;
 
-            std::thread::sleep(interval.sub(start.elapsed()));
+            let subtracted_duration = interval.saturating_sub(start.elapsed());
+            if subtracted_duration != Duration::ZERO {
+                std::thread::sleep(subtracted_duration);
+            }
         }
 
         Ok(())
