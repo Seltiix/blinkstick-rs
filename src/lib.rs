@@ -5,6 +5,7 @@
 
 use crate::FeatureErrorType::{Get, Send};
 use rand::Rng;
+use std::error::Error;
 use std::fmt::Formatter;
 use std::ops::{Div, Sub};
 use std::{time::Duration, time::Instant};
@@ -21,7 +22,7 @@ pub struct FeatureError {
     pub kind: FeatureErrorType,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum FeatureErrorType {
     Get,
     Send,
@@ -29,9 +30,15 @@ pub enum FeatureErrorType {
 
 impl std::fmt::Display for FeatureError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Could not communicate feature from/to BlinkStick")
+        if self.kind == FeatureErrorType::Get {
+            write!(f, "Failed retrieving data from BlinkStick device")
+        } else {
+            write!(f, "Failed setting data for BlinkStick device")
+        }
     }
 }
+
+impl Error for FeatureError {}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Color {
@@ -49,7 +56,10 @@ pub struct BlinkStick {
 
 impl Drop for BlinkStick {
     fn drop(&mut self) {
-        self.set_all_leds_color(COLOR_OFF).unwrap()
+        match self.set_all_leds_color(COLOR_OFF) {
+            Ok(()) => (),
+            Err(e) => eprintln!("Could not drop due to error: {}", e),
+        }
     }
 }
 
